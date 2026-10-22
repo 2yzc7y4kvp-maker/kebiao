@@ -1002,6 +1002,7 @@ function dateOfDay(iso, week, day){
       if (!PET.greeted){ PET.greeted = true; setTimeout(petGreet, 600); }
     }
     if (v === 'settings') renderSettings();
+    if (PET.bubble) PET.bubble.classList.remove('show');
     window.scrollTo(0, 0);
   }
 
