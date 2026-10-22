@@ -133,15 +133,15 @@
   summary{font-size:13px; cursor:pointer; color:var(--text);}
   /* ---- dsh-pet ---- */
   .petwrap{position:fixed; right:8px; bottom:calc(78px + env(safe-area-inset-bottom)); z-index:36;
-           width:68px; height:68px; touch-action:none; -webkit-user-select:none; user-select:none;}
+           width:88px; height:88px; touch-action:none; -webkit-user-select:none; user-select:none;}
   .petwrap.off{display:none;}
-  .petwrap img{width:68px; height:68px; display:block; pointer-events:none;
+  .petwrap img{width:88px; height:88px; display:block; pointer-events:none;
                filter:drop-shadow(0 8px 10px rgba(20,30,60,.22));
                animation:petFloat 3.8s ease-in-out infinite;}
   @keyframes petFloat{0%,100%{transform:translateY(0) rotate(-2deg);}50%{transform:translateY(-7px) rotate(2deg);}}
   .petwrap.pop img{animation:petPop .5s cubic-bezier(.2,.9,.3,1);}
   @keyframes petPop{0%{transform:scale(1) rotate(0);}40%{transform:scale(1.16) rotate(5deg);}70%{transform:scale(.97) rotate(-2deg);}100%{transform:scale(1) rotate(0);}}
-  .pet-bubble{position:absolute; right:2px; bottom:74px; width:max-content; max-width:188px;
+  .pet-bubble{position:absolute; right:2px; bottom:94px; width:max-content; max-width:188px;
               background:var(--card); color:var(--text); border:1px solid var(--line); border-radius:14px;
               padding:8px 11px; font-size:12.5px; line-height:1.45; box-shadow:var(--shadow);
               opacity:0; transform:translateY(6px) scale(.96); transform-origin:right bottom;
@@ -867,8 +867,8 @@ function dateOfDay(iso, week, day){
     var p = state.settings.petPos;
     var right = p && typeof p.right === 'number' ? p.right : 8;
     var bottom = p && typeof p.bottom === 'number' ? p.bottom : 78;
-    PET.el.style.right = clampNum(right, 4, window.innerWidth - 74) + 'px';
-    PET.el.style.bottom = clampNum(bottom, 8, window.innerHeight - 110) + 'px';
+    PET.el.style.right = clampNum(right, 4, window.innerWidth - 94) + 'px';
+    PET.el.style.bottom = clampNum(bottom, 8, window.innerHeight - 130) + 'px';
   }
   function petShow(){
     if (!PET.el) return;
@@ -899,8 +899,8 @@ function dateOfDay(iso, week, day){
       if (!PET.drag.moved && Math.abs(dx) + Math.abs(dy) < 6) return;
       PET.drag.moved = true;
       PET.el.classList.add('dragging');
-      PET.el.style.right = clampNum(PET.drag.r - dx, 4, window.innerWidth - 74) + 'px';
-      PET.el.style.bottom = clampNum(PET.drag.b - dy, 8, window.innerHeight - 110) + 'px';
+      PET.el.style.right = clampNum(PET.drag.r - dx, 4, window.innerWidth - 94) + 'px';
+      PET.el.style.bottom = clampNum(PET.drag.b - dy, 8, window.innerHeight - 130) + 'px';
       if (e.cancelable) e.preventDefault();
     });
     PET.el.addEventListener('pointerup', function(){
