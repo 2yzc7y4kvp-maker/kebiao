@@ -1,4 +1,4 @@
-const CACHE = 'huang-schedule-v8';
+const CACHE = 'huang-schedule-v9';
 const ASSETS = [
   './',
   './index.html',
@@ -22,14 +22,36 @@ self.addEventListener('activate', event => {
   );
 });
 
+function timeout(ms) {
+  return new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms));
+}
+
 self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET') return;
+  const req = event.request;
+  if (req.method !== 'GET') return;
+
+  const isDoc = req.mode === 'navigate' || (req.headers.get('accept') || '').indexOf('text/html') >= 0;
+
+  if (isDoc) {
+    // 有网先拿最新页面，没网或超时再用缓存
+    event.respondWith(
+      Promise.race([fetch(req), timeout(4000)]).then(res => {
+        if (res && res.ok) {
+          const copy = res.clone();
+          caches.open(CACHE).then(c => c.put('./index.html', copy)).catch(() => {});
+        }
+        return res;
+      }).catch(() => caches.match('./index.html').then(hit => hit || caches.match('./')))
+    );
+    return;
+  }
+
   event.respondWith(
-    caches.match(event.request, { ignoreSearch: true }).then(hit => {
+    caches.match(req).then(hit => {
       if (hit) return hit;
-      return fetch(event.request).then(res => {
+      return fetch(req).then(res => {
         const copy = res.clone();
-        caches.open(CACHE).then(cache => cache.put(event.request, copy)).catch(() => {});
+        caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
         return res;
       }).catch(() => caches.match('./index.html'));
     })
