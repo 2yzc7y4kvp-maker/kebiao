@@ -1,4 +1,4 @@
-const CACHE = 'huang-schedule-v5';
+const CACHE = 'huang-schedule-v6';
 const ASSETS = [
   './',
   './index.html',
