@@ -1,4 +1,4 @@
-const CACHE = 'huang-schedule-v9';
+const CACHE = 'huang-schedule-v10';
 const ASSETS = [
   './',
   './index.html',
@@ -54,6 +54,37 @@ self.addEventListener('fetch', event => {
         caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
         return res;
       }).catch(() => caches.match('./index.html'));
+    })
+  );
+});
+
+/* ---------- 推送通知 ---------- */
+self.addEventListener('push', event => {
+  let data = {};
+  try { data = event.data ? event.data.json() : {}; } catch (e) { data = { body: event.data ? event.data.text() : '' }; }
+  const title = data.title || '大肥鱼：要上课啦';
+  const options = {
+    body: data.body || '该去教室了',
+    tag: data.tag || 'class',
+    renotify: true,
+    requireInteraction: !!data.requireInteraction,
+    icon: './icon-192.png',
+    badge: './icon-192.png',
+    data: { url: data.url || './' }
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+/* ---------- 点通知：回到 App ---------- */
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const target = (event.notification.data && event.notification.data.url) || './';
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+      for (const c of list) {
+        if ('focus' in c) return c.focus();
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(target);
     })
   );
 });
