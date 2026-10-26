@@ -1,4 +1,4 @@
-﻿const CACHE = 'huang-schedule-v11';
+const CACHE = 'huang-schedule-v11';
 const ASSETS = [
   './',
   './index.html',
@@ -33,7 +33,8 @@ self.addEventListener('fetch', event => {
   const isDoc = req.mode === 'navigate' || (req.headers.get('accept') || '').indexOf('text/html') >= 0;
 
   if (isDoc) {
-    // 鏈夌綉鍏堟嬁鏈€鏂伴〉闈紝娌＄綉鎴栬秴鏃跺啀鐢ㄧ紦瀛?    event.respondWith(
+    // 有网先拿最新页面，没网或超时再用缓存
+    event.respondWith(
       Promise.race([fetch(req), timeout(4000)]).then(res => {
         if (res && res.ok) {
           const copy = res.clone();
@@ -57,7 +58,7 @@ self.addEventListener('fetch', event => {
   );
 });
 
-/* ---------- 鎺ㄩ€侀€氱煡 ---------- */
+/* ---------- 推送通知 ---------- */
 const PUSH_LOG = 'push-log';
 const PUSH_LOG_KEY = './__lastpush';
 
@@ -72,36 +73,52 @@ async function logPush(entry) {
 
 self.addEventListener('push', event => {
   event.waitUntil((async () => {
-    let raw = '', data = {}, err = '';
-    try { raw = event.data ? event.data.text() : ''; } catch (e) { err = 'text:' + e.message; }
-    try { data = raw ? JSON.parse(raw) : {}; } catch (e) { data = { body: raw }; err = (err + ' json:' + e.message).trim(); }
+    let raw = '';
+    let data = {};
+    let err = '';
 
-    await logPush({ at: Date.now(), raw, parsed: data, err });
+    try {
+      raw = event.data ? event.data.text() : '';
+    } catch (e) {
+      err = 'text:' + e.message;
+    }
+    try {
+      data = raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      data = { body: raw };
+      err = (err + ' json:' + e.message).trim();
+    }
 
-    // 鍛婅瘔寮€鐫€鐨勯〉闈?    try {
+    await logPush({ at: Date.now(), raw: raw, parsed: data, err: err });
+
+    // 告诉正在开着的页面
+    try {
       const list = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
       for (const c of list) c.postMessage({ type: 'push-received', payload: data });
     } catch (e) {}
 
-    const title = data.title || '澶ц偉楸硷細瑕佷笂璇惧暒';
-    const body = data.body || '璇ュ幓鏁欏浜?;
+    const title = data.title || '大肥鱼：要上课啦';
+    const body = data.body || '该去教室了';
 
-    // iOS 瀵?options 鎸戯紝鍏堢粰鏈€绠€鐨勶紱澶辫触鍐嶉檷绾?    try {
+    // iOS 对 options 挑，先给最简的，失败再降级
+    try {
       await self.registration.showNotification(title, {
-        body, tag: data.tag || 'class', data: { url: data.url || './' }
+        body: body,
+        tag: data.tag || 'class',
+        data: { url: data.url || './' }
       });
     } catch (e1) {
-      await logPush({ at: Date.now(), raw, parsed: data, err: 'show1:' + e1.message, fallback: true });
+      await logPush({ at: Date.now(), raw: raw, parsed: data, err: 'show1:' + e1.message, fallback: true });
       try {
-        await self.registration.showNotification(title, { body });
+        await self.registration.showNotification(title, { body: body });
       } catch (e2) {
-        await logPush({ at: Date.now(), raw, parsed: data, err: 'show2:' + e2.message, fallback: true });
+        await logPush({ at: Date.now(), raw: raw, parsed: data, err: 'show2:' + e2.message, fallback: true });
       }
     }
   })());
 });
 
-/* ---------- 鐐归€氱煡锛氬洖鍒?App ---------- */
+/* ---------- 点通知：回到 App ---------- */
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   const target = (event.notification.data && event.notification.data.url) || './';
