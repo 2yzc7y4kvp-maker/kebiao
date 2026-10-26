@@ -207,6 +207,20 @@
   .remind .r-main{font-size:23px; font-weight:700; margin:9px 0 6px; line-height:1.32;}
   .remind .r-sub{font-size:15px; color:var(--muted); line-height:1.65;}
   .remind .r-btn{margin-top:18px; width:100%; font-size:16px; padding:12px;}
+  /* ---- 订阅码 ---- */
+  .subcode{position:fixed; inset:0; z-index:68; display:none; align-items:center; justify-content:center; padding:18px;}
+  .subcode.open{display:flex;}
+  .subcode .mask{position:absolute; inset:0; background:rgba(8,10,18,.55);}
+  .subcode .box{position:relative; width:100%; max-width:460px; max-height:86vh; display:flex;
+    flex-direction:column; background:var(--card); border-radius:20px; padding:20px 18px 16px;
+    box-shadow:0 20px 64px rgba(10,14,30,.4);}
+  .subcode h3{margin:0 0 6px; font-size:19px;}
+  .subcode p{margin:0 0 10px; font-size:13.5px; color:var(--muted); line-height:1.6;}
+  .subcode textarea{flex:1 1 auto; min-height:150px; width:100%; resize:none; font-size:12px;
+    line-height:1.5; font-family:ui-monospace,Menlo,monospace; word-break:break-all;
+    background:var(--bg); color:var(--text); border:1px solid var(--line); border-radius:10px; padding:10px;}
+  .subcode .btns{padding:12px 0 0;}
+  .subcode .btns .btn{flex:1;}
   /* ---- 通知设置 ---- */
   .notify-state{font-weight:600;}
   .notify-state.ok{color:#22a06b;}
@@ -405,6 +419,19 @@
     <div class="r-main" id="remind-main"></div>
     <div class="r-sub" id="remind-sub"></div>
     <button class="btn primary r-btn" id="remind-ok">知道了</button>
+  </div>
+</div>
+
+<div class="subcode" id="subcode">
+  <div class="mask" id="subcode-mask"></div>
+  <div class="box">
+    <h3>订阅码</h3>
+    <p>长按下面框里的文字 →「全选」→「复制」，然后发给 dsh。<br>看不到复制菜单就点下面的「复制」按钮。</p>
+    <textarea id="subcode-text" readonly></textarea>
+    <div class="btns">
+      <button class="btn primary" id="subcode-copy">复制</button>
+      <button class="btn" id="subcode-close">关闭</button>
+    </div>
   </div>
 </div>
 
@@ -1152,11 +1179,7 @@ function dateOfDay(iso, week, day){
       .catch(function(e){
         renderNotify();
         if (got){
-          var code = JSON.stringify(got.toJSON());
-          copyText(code, '推送服务器连不上，订阅码已复制 —— 发给 dsh 就行');
-          setTimeout(function(){
-            note('订阅码已复制。这台服务器当前网络打不开，改用订阅码方式（发给我即可）');
-          }, 400);
+          showSubCode(JSON.stringify(got.toJSON()));
           return false;
         }
         var m = (e && e.name === 'AbortError') || (e && e.message === 'timeout');
@@ -1165,6 +1188,33 @@ function dateOfDay(iso, week, day){
         return false;
       });
   }
+  function showSubCode(code){
+    var el = $('#subcode'), ta = $('#subcode-text');
+    if (!el || !ta) return;
+    ta.value = code;
+    el.classList.add('open');
+  }
+  function hideSubCode(){
+    var el = $('#subcode');
+    if (el) el.classList.remove('open');
+  }
+  function copySubCode(){
+    var ta = $('#subcode-text');
+    if (!ta) return;
+    ta.focus();
+    ta.select();
+    ta.setSelectionRange(0, ta.value.length);
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    if (ok){ toast('已复制，发给我就行'); return; }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(ta.value).then(function(){ toast('已复制'); },
+        function(){ toast('复制失败，长按框里文字手动选'); });
+    } else {
+      toast('复制失败，长按框里文字手动选');
+    }
+  }
+
   function pushOff(){
     return currentSub().then(function(sub){
       if (!sub) return false;
@@ -1448,6 +1498,10 @@ function dateOfDay(iso, week, day){
     });
     if (nt) nt.addEventListener('click', sysNotifyTest);
     if (pff) pff.addEventListener('click', pushOff);
+    var scC = $('#subcode-close'), scP = $('#subcode-copy'), scM = $('#subcode-mask');
+    if (scC) scC.addEventListener('click', hideSubCode);
+    if (scM) scM.addEventListener('click', hideSubCode);
+    if (scP) scP.addEventListener('click', copySubCode);
 
     $('#btn-export').addEventListener('click', exportFile);
     $('#btn-copy').addEventListener('click', function(){ copyText(exportText(), '已复制 JSON'); });
