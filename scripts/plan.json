@@ -1,9 +1,9 @@
 {
-  "startDate": "2026-10-19",
+  "startDate": "2026-09-14",
   "times": [
     [
-      "22:03",
-      "23:59"
+      "08:00",
+      "09:40"
     ],
     [
       "10:00",
@@ -28,12 +28,165 @@
   ],
   "courses": [
     {
-      "name": "大学物理A(1)",
-      "short": "大物",
+      "name": "大学英语C(1)",
+      "short": "大英C",
       "day": 0,
       "slot": 0,
       "weeks": "1-16",
+      "room": "C114",
+      "campus": "宝山主区"
+    },
+    {
+      "name": "高等数学A(1)",
+      "short": "高数A",
+      "day": 0,
+      "slot": 1,
+      "weeks": "1-16",
+      "room": "BJ207",
+      "campus": "宝山主区"
+    },
+    {
+      "name": "程序设计(C语言)",
+      "short": "程设",
+      "day": 0,
+      "slot": 2,
+      "weeks": "1-16",
+      "room": "DJ304",
+      "campus": "宝山主区"
+    },
+    {
+      "name": "大学物理实验A(1)",
+      "short": "大物实验",
+      "day": 0,
+      "slot": 3,
+      "weeks": "1-16",
+      "room": "F楼实验中心",
+      "campus": "宝山主区"
+    },
+    {
+      "name": "开源技术基础与人工智能应用实践",
+      "short": "开源AI",
+      "day": 0,
+      "slot": 4,
+      "weeks": "9-16",
+      "room": "D415",
+      "campus": "宝山主区"
+    },
+    {
+      "name": "军事理论",
+      "short": "军理",
+      "day": 0,
+      "slot": 5,
+      "weeks": "1,8,16",
+      "room": "EJ206",
+      "campus": "宝山主区"
+    },
+    {
+      "name": "国家安全教育",
+      "short": "国安",
+      "day": 1,
+      "slot": 0,
+      "weeks": "9-16",
+      "room": "AJ203",
+      "campus": "宝山主区"
+    },
+    {
+      "name": "思想道德与法治",
+      "short": "思政",
+      "day": 1,
+      "slot": 1,
+      "weeks": "1-16",
+      "room": "AJ107",
+      "campus": "宝山主区"
+    },
+    {
+      "name": "大学物理A(1)",
+      "short": "大物",
+      "day": 1,
+      "slot": 3,
+      "weeks": "1-16",
       "room": "DJ204",
+      "campus": "宝山主区"
+    },
+    {
+      "name": "高等数学A(1)",
+      "short": "高数A",
+      "day": 2,
+      "slot": 1,
+      "weeks": "1-16",
+      "room": "BJ207",
+      "campus": "宝山主区"
+    },
+    {
+      "name": "程序设计(C语言)",
+      "short": "程设",
+      "day": 2,
+      "slot": 2,
+      "weeks": "1-16",
+      "room": "D413",
+      "campus": "宝山主区"
+    },
+    {
+      "name": "大学化学实验",
+      "short": "大化实验",
+      "day": 2,
+      "slot": 3,
+      "weeks": "1-16",
+      "room": "HA四楼",
+      "campus": "宝山主区"
+    },
+    {
+      "name": "思想道德与法治",
+      "short": "思政",
+      "day": 3,
+      "slot": 1,
+      "weeks": "1-16",
+      "room": "AJ107",
+      "campus": "宝山主区"
+    },
+    {
+      "name": "大学化学",
+      "short": "大化",
+      "day": 3,
+      "slot": 2,
+      "weeks": "1-16",
+      "room": "EJ204",
+      "campus": "宝山主区"
+    },
+    {
+      "name": "大学物理A(1)",
+      "short": "大物",
+      "day": 3,
+      "slot": 3,
+      "weeks": "1-16",
+      "room": "DJ204",
+      "campus": "宝山主区"
+    },
+    {
+      "name": "形势与政策",
+      "short": "形政",
+      "day": 3,
+      "slot": 5,
+      "weeks": "2,6,10,14",
+      "room": "201",
+      "campus": "延长主区"
+    },
+    {
+      "name": "体育基础课",
+      "short": "体育",
+      "day": 4,
+      "slot": 0,
+      "weeks": "1-16",
+      "room": "EJ06",
+      "campus": "宝山主区"
+    },
+    {
+      "name": "高等数学A(1)",
+      "short": "高数A",
+      "day": 4,
+      "slot": 1,
+      "weeks": "1-16",
+      "room": "BJ207",
       "campus": "宝山主区"
     }
   ]

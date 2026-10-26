@@ -1,7 +1,8 @@
 {
-  "endpoint": "http://127.0.0.1:50167/wp/test",
+  "endpoint": "https://web.push.apple.com/QKUxkh0nCstqywXGoyyAR-lvVNozI6TZtI8ydYs-r0Wf0Xb41MbkrbJttG5sdIXCvkXvO4LtgVzBKAOp4uMZQMt-hOjWXsu3TiiK6k6c_VUQaMczdOCYjwC5uvpKKGJaJ7hRBFmgGCmHQ8BaRwrh-A52v_VFfbgurO0p2ZZ0nK8",
+  "expirationTime": null,
   "keys": {
-    "p256dh": "BIhp7rmhdxyHNJdjdcqMQAO_68L7-aJ9LzbcOlwbur1F5-D1fnS53Eyumhwwy7i4laiNI9Eq6f2tKQWRYN3usf0",
-    "auth": "DNYr3Mu4ZP0pmYj2EfOKUg"
+    "p256dh": "BBUCAAl75xKFowi9cVd-nK2jgzeLRqASv2f-vmeKnCyu0xZh1DF1zqI6jbVX4oKSNqLZrJzMNelLC9LlMNJzkDA",
+    "auth": "Uei_CczuIVQEbOGMzvQ2Rw"
   }
 }
