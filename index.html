@@ -46,65 +46,65 @@
        min-height:100vh; min-height:100dvh;
        padding-bottom:calc(var(--tabh) + 40px + env(safe-area-inset-bottom));}
   .top{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex:none;
-       padding:calc(14px + env(safe-area-inset-top)) 16px 8px; background:var(--bg);}
-  .top .name{font-size:23px; font-weight:700; letter-spacing:.01em;}
-  .top .sub{font-size:14px; color:var(--muted); margin-top:3px;}
-  .top .mark{font-size:12.5px; color:var(--muted); text-align:right; line-height:1.5; flex:none;}
+       padding:calc(20px + env(safe-area-inset-top)) 16px 8px; background:var(--bg);}
+  .top .name{font-size:27px; font-weight:700; letter-spacing:.01em;}
+  .top .sub{font-size:15.5px; color:var(--muted); margin-top:3px;}
+  .top .mark{font-size:13.5px; color:var(--muted); text-align:right; line-height:1.5; flex:none;}
   .top > div:first-child{min-width:0;}
-  .top .mark b{display:block; color:var(--text); font-size:15px;}
+  .top .mark b{display:block; color:var(--text); font-size:16.5px;}
   .topright{display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex:none;}
-  .brand{display:flex; align-items:center; gap:6px; font-size:12px; letter-spacing:.02em;
+  .brand{display:flex; align-items:center; gap:6px; font-size:13px; letter-spacing:.02em;
          color:var(--muted); line-height:1;}
-  .brand .pet{width:26px; height:26px; border-radius:50%; object-fit:cover; display:block;
+  .brand .pet{width:30px; height:30px; border-radius:50%; object-fit:cover; display:block;
               background:#fff; box-shadow:0 0 0 1px var(--line);}
   .weekbar{display:flex; align-items:center; gap:8px; padding:6px 14px 2px;}
   .wlabel{flex:1; text-align:center; line-height:1.35;}
-  .wlabel b{font-size:19px; font-weight:700;}
-  .wlabel span{display:block; font-size:13px; color:var(--muted); letter-spacing:.02em;}
-  .icon-btn{width:42px; height:42px; flex:none; border-radius:12px; border:1px solid var(--line);
-    background:var(--card); color:var(--text); font-size:23px; line-height:1; display:grid; place-items:center;}
+  .wlabel b{font-size:22px; font-weight:700;}
+  .wlabel span{display:block; font-size:14px; color:var(--muted); letter-spacing:.02em;}
+  .icon-btn{width:46px; height:46px; flex:none; border-radius:13px; border:1px solid var(--line);
+    background:var(--card); color:var(--text); font-size:26px; line-height:1; display:grid; place-items:center;}
   .icon-btn:active{transform:scale(.94);}
   .wrow{text-align:center; padding:6px 0 0; min-height:6px;}
-  .chip{font-size:14px; padding:6px 15px; border-radius:999px; background:var(--card);
+  .chip{font-size:15px; padding:7px 16px; border-radius:999px; background:var(--card);
         border:1px solid var(--line); color:var(--accent); font-weight:600;}
   #view-week{display:flex; flex-direction:column; flex:1 1 auto; min-height:0;}
-  .grid{display:grid; grid-template-columns:48px repeat(5,minmax(0,1fr));
-        grid-template-rows:auto repeat(6,minmax(58px,1fr)); gap:5px; padding:10px 12px 0;
+  .grid{display:grid; grid-template-columns:46px repeat(5,minmax(0,1fr));
+        grid-template-rows:auto repeat(6,minmax(58px,1fr)); gap:4px; padding:8px 8px 0;
         touch-action:pan-y; width:100%; flex:1 1 auto; min-height:0;}
   .corner{min-height:0;}
-  .dhead{min-height:0; font-size:12px; color:var(--muted); text-align:center; line-height:1.25;
+  .dhead{min-height:0; font-size:13px; color:var(--muted); text-align:center; line-height:1.25;
          display:flex; flex-direction:column; justify-content:flex-end; padding-bottom:3px;}
-  .dhead b{display:block; font-size:14.5px; font-weight:600; color:var(--text);}
+  .dhead b{display:block; font-size:16px; font-weight:600; color:var(--text);}
   .dhead.today b{color:var(--accent);}
   .dhead.today{color:var(--accent);}
   .tcell{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
-         font-size:10.5px; color:var(--muted); letter-spacing:.02em;}
-  .tcell b{font-size:13px; font-weight:600; color:var(--text);}
+         font-size:12px; color:var(--muted); letter-spacing:.02em;}
+  .tcell b{font-size:15px; font-weight:600; color:var(--text);}
   .cell{min-height:0; min-width:0; display:flex; flex-direction:column; gap:4px;}
   .course{flex:1; width:100%; min-width:0; min-height:0; border:0; border-left:3px solid var(--c);
-    border-radius:11px; background:var(--tint); color:var(--text); padding:7px 6px;
+    border-radius:11px; background:var(--tint); color:var(--text); padding:6px 4px;
     text-align:left; display:flex; flex-direction:column; justify-content:space-between; gap:3px;
     overflow:hidden; box-shadow:var(--shadow);}
   .course:active{filter:brightness(.97);}
-  .course .nm{font-size:14px; font-weight:600; line-height:1.22; overflow-wrap:anywhere; word-break:break-word;
+  .course .nm{font-size:18px; font-weight:600; line-height:1.2; letter-spacing:-.02em; overflow-wrap:anywhere; word-break:break-word;
     display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;}
-  .course.small .nm{font-size:13px;}
-  .course.tiny .nm{font-size:11.5px; -webkit-line-clamp:3; line-height:1.18;}
+  .course.small .nm{font-size:16px;}
+  .course.tiny .nm{font-size:14px; -webkit-line-clamp:4; line-height:1.16;}
   .course .nm{max-width:100%;}
-  .course .rm{font-size:11.5px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .hint{text-align:center; font-size:12.5px; color:var(--muted); padding:10px 172px 6px 14px; margin-top:auto; line-height:1.5;}
+  .course .rm{font-size:13px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .hint{text-align:center; font-size:13.5px; color:var(--muted); padding:10px 172px 6px 14px; margin-top:auto; line-height:1.5;}
   .today-head{padding:10px 16px 0;}
-  .today-date{font-size:27px; font-weight:700; letter-spacing:.01em;}
-  .today-meta{font-size:14.5px; color:var(--muted); margin-top:4px;}
+  .today-date{font-size:31px; font-weight:700; letter-spacing:.01em;}
+  .today-meta{font-size:16px; color:var(--muted); margin-top:4px;}
   .list{padding:14px 14px 24px; display:flex; flex-direction:column; gap:10px;}
   .lesson{display:flex; gap:12px; width:100%; text-align:left; border:0; border-left:3px solid var(--c);
     background:var(--card); border-radius:14px; padding:12px; box-shadow:var(--shadow); color:var(--text);}
-  .lesson .when{width:74px; flex:none; font-size:12.5px; color:var(--muted); line-height:1.6;}
-  .lesson .when b{display:block; font-size:13.5px; color:var(--text);}
+  .lesson .when{width:82px; flex:none; font-size:14px; color:var(--muted); line-height:1.6;}
+  .lesson .when b{display:block; font-size:15px; color:var(--text);}
   .lesson .what{flex:1; min-width:0;}
-  .lesson .n{font-size:18px; font-weight:600; line-height:1.3;}
-  .lesson .m{font-size:13.5px; color:var(--muted); margin-top:2px;}
-  .badge{display:inline-block; font-size:13px; padding:3px 10px; border-radius:999px;
+  .lesson .n{font-size:21px; font-weight:600; line-height:1.3;}
+  .lesson .m{font-size:15px; color:var(--muted); margin-top:2px;}
+  .badge{display:inline-block; font-size:14.5px; padding:4px 11px; border-radius:999px;
     background:var(--soft); color:var(--accent); margin-top:7px; font-weight:600;}
   .badge.done{background:rgba(122,128,140,.12); color:var(--muted); font-weight:500;}
   .empty{text-align:center; padding:46px 24px; color:var(--muted); font-size:15px; line-height:1.8;}
@@ -213,15 +213,15 @@
   .notify-state.no{color:#e2504f;}
   /* ---- 窄屏：5 列太窄，字号和间距让一让，别让「高数A」拆成两行 ---- */
   @media (max-width: 382px){
-    .grid{padding:10px 8px 0; gap:4px; grid-template-columns:44px repeat(5,minmax(0,1fr));}
-    .course{padding:6px 4px; border-left-width:3px;}
-    .course .nm{font-size:12.5px;}
-    .course.small .nm{font-size:12px;}
-    .course.tiny .nm{font-size:10.5px;}
-    .tcell{font-size:9.5px;}
-    .tcell b{font-size:12px;}
-    .dhead{font-size:11px;}
-    .dhead b{font-size:13.5px;}
+    .grid{padding:8px 6px 0; gap:3px; grid-template-columns:42px repeat(5,minmax(0,1fr));}
+    .course{padding:5px 3px; border-left-width:3px;}
+    .course .nm{font-size:15px;}
+    .course.small .nm{font-size:14px;}
+    .course.tiny .nm{font-size:12.5px;}
+    .tcell{font-size:10.5px;}
+    .tcell b{font-size:13.5px;}
+    .dhead{font-size:12px;}
+    .dhead b{font-size:15px;}
   }
   /* ---- 矮屏：底栏和肥鱼一起收，别把课表挤没了 ---- */
   @media (max-height: 730px){
@@ -619,6 +619,7 @@ function dateOfDay(iso, week, day){
     var nm = c.short || c.name;
     var cls = nm.length > 9 ? ' tiny' : (nm.length > 5 ? ' small' : '');
     var label = esc(nm).replace(/[（(]/g, '\u200b$&');
+    if (/^[\u4e00-\u9fa5]{4,}$/.test(nm)) label = label.slice(0, 2) + '<br>' + label.slice(2);
     return '<button class="course' + cls + '" data-i="' + i + '" style="--c:' + col + ';--tint:' + tint(col, isDark() ? .22 : .13) + '">' +
       '<span class="nm">' + label + '</span>' +
       '<span class="rm">' + esc(c.room) + '</span></button>';
