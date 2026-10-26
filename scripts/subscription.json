@@ -1,1 +1,7 @@
-﻿{ "endpoint": "", "keys": { "p256dh": "", "auth": "" } }
+{
+  "endpoint": "",
+  "keys": {
+    "p256dh": "",
+    "auth": ""
+  }
+}
