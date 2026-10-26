@@ -349,6 +349,7 @@
       <div class="row"><span class="k">App 内弹框</span><span class="v notify-state ok">一直开着</span></div>
       <div class="row"><span class="k">系统通知</span><span class="v notify-state" id="notify-state">未开启</span></div>
       <div class="row"><span class="k">关掉 App 也提醒</span><span class="v notify-state" id="push-state">未开启</span></div>
+      <div class="row"><span class="k">最近收到推送</span><span class="v" id="push-last">—</span></div>
       <div class="btns">
         <button class="btn primary" id="notify-on">开启上课提醒</button>
         <button class="btn hidden" id="notify-test">试一下</button>
@@ -1234,6 +1235,28 @@ function dateOfDay(iso, week, day){
   }
 
   /* ---------- 系统通知 ---------- */
+  function readPushLog(){
+    if (!('caches' in window)) return Promise.resolve(null);
+    return caches.open('push-log')
+      .then(function(c){ return c.match('./__lastpush'); })
+      .then(function(r){ return r ? r.json() : null; })
+      .catch(function(){ return null; });
+  }
+  function showPushLog(){
+    var el = $('#push-last');
+    if (!el) return;
+    readPushLog().then(function(g){
+      if (!g || !g.at){ el.textContent = '还没收到过'; return; }
+      var d = new Date(g.at);
+      var t = (d.getMonth() + 1) + '/' + d.getDate() + ' ' +
+              String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+      var title = (g.parsed && g.parsed.title) || '';
+      el.textContent = t + (title ? ' · ' + title : '') + (g.err ? ' · 出错' : '');
+      el.title = g.err || '';
+      el.className = 'v notify-state ' + (g.err ? 'no' : 'ok');
+    });
+  }
+
   function notifySupported(){ return typeof Notification !== 'undefined'; }
   function notifyGranted(){ return notifySupported() && Notification.permission === 'granted'; }
   function sysNotify(c, n){
@@ -1270,6 +1293,7 @@ function dateOfDay(iso, week, day){
     }
     if (test) test.classList.toggle('hidden', p !== 'granted');
 
+    showPushLog();
     var ps = $('#push-state');
     currentSub().then(function(sub){
       var el2 = $('#push-state');
@@ -1553,6 +1577,14 @@ function dateOfDay(iso, week, day){
   document.addEventListener('visibilitychange', function(){
     if (!document.hidden) { checkRemind(); renderNotify(); }
   });
+  if ('serviceWorker' in navigator){
+    navigator.serviceWorker.addEventListener('message', function(e){
+      if (e.data && e.data.type === 'push-received'){
+        toast('收到推送：' + ((e.data.payload && e.data.payload.title) || '无标题'));
+        renderNotify();
+      }
+    });
+  }
   viewWeek = currentWeek();
   buildTimeRows();
   wire();
