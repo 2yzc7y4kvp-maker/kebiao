@@ -1094,17 +1094,36 @@ function dateOfDay(iso, week, day){
       courses: state.courses
     };
   }
+  function isIOS(){ return /iPhone|iPad|iPod/.test(navigator.userAgent); }
+  function note(msg){
+    var el = $('#notify-note');
+    if (el) el.textContent = msg;
+    toast(msg);
+  }
+  function fetchTimeout(url, opt, ms){
+    return new Promise(function(resolve, reject){
+      var c = new AbortController();
+      var t = setTimeout(function(){ c.abort(); reject(new Error('timeout')); }, ms);
+      fetch(url, Object.assign({}, opt, { signal: c.signal }))
+        .then(function(r){ clearTimeout(t); resolve(r); },
+              function(e){ clearTimeout(t); reject(e); });
+    });
+  }
   function pushOn(){
     if (!pushReady()){
-      toast('推送服务器还没接上（后端还没部署）');
+      note('推送服务器还没接上（后端还没部署）');
       return Promise.resolve(false);
     }
     if (!('PushManager' in window)){
-      toast('这个浏览器不支持推送');
+      note('这个浏览器不支持推送');
+      return Promise.resolve(false);
+    }
+    if (isIOS() && !standalone()){
+      note('iPhone 上要先「添加到主屏幕」，再从桌面图标打开才能开推送');
       return Promise.resolve(false);
     }
     if (!notifyGranted()){
-      toast('先开系统通知');
+      note('先点「开启上课提醒」，允许通知');
       return Promise.resolve(false);
     }
     return swReady()
@@ -1118,20 +1137,25 @@ function dateOfDay(iso, week, day){
         });
       })
       .then(function(sub){
-        return fetch(PUSH.api + '/api/sub', {
+        return fetchTimeout(PUSH.api + '/api/sub', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ subscription: sub.toJSON(), plan: subPlan() })
-        }).then(function(r){ return r.json(); });
+        }, 9000).then(function(r){ return r.json(); });
       })
       .then(function(j){
         renderNotify();
-        if (j && j.ok){ toast('推送已开启，锁屏也能收到'); return true; }
-        toast('订阅没成功，待会再试');
+        if (j && j.ok){
+          note('推送已开启，锁屏、App 划掉都能收到');
+          return true;
+        }
+        note('订阅没成功，服务器返回异常');
         return false;
       })
       .catch(function(e){
-        toast('订阅失败：' + (e && e.message ? e.message : '未知错误'));
+        var m = e && e.name === 'AbortError' || (e && e.message === 'timeout');
+        note(m ? '连不上推送服务器（网络不通），这一项暂时用不了'
+               : '订阅失败：' + (e && e.message ? e.message : '未知错误'));
         return false;
       });
   }
