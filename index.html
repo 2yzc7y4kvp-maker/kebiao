@@ -1060,7 +1060,7 @@ function dateOfDay(iso, week, day){
   /* ---------- Web Push ---------- */
   // api 部署后填；key 是 VAPID 公钥（和后端 VAPID_PUBLIC_KEY 一致）
   var PUSH = {
-    api: '',
+    api: 'https://kebiao-push.kebiao-push-2yzc.workers.dev',
     key: 'BNQ5Ii6XT9x-KMhUMR1rbpJBlbHp-uJvI7vDeQUwR-87EwFeF9TPAmbCwlRsJwuUkMxOVy0NWIy1v74aijJOiPI'
   };
   function pushReady(){ return !!(PUSH.api && PUSH.key); }
