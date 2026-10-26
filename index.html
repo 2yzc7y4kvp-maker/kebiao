@@ -1062,7 +1062,7 @@ function dateOfDay(iso, week, day){
   // api 部署后填；key 是 VAPID 公钥（和后端 VAPID_PUBLIC_KEY 一致）
   var PUSH = {
     api: 'https://kebiao-push.kebiao-push-2yzc.workers.dev',
-    key: 'BNQ5Ii6XT9x-KMhUMR1rbpJBlbHp-uJvI7vDeQUwR-87EwFeF9TPAmbCwlRsJwuUkMxOVy0NWIy1v74aijJOiPI'
+    key: 'BEfposRL9rZ3bXF6uD1sl3IJEe36xrsAcx_b-XANSqo6LTpY7a1XKqcPXUdeSBYT02LKRtlmePHdmLGkuUn9BT0'
   };
   function pushReady(){ return !!(PUSH.api && PUSH.key); }
   function standalone(){
@@ -1110,10 +1110,6 @@ function dateOfDay(iso, week, day){
     });
   }
   function pushOn(){
-    if (!pushReady()){
-      note('推送服务器还没接上（后端还没部署）');
-      return Promise.resolve(false);
-    }
     if (!('PushManager' in window)){
       note('这个浏览器不支持推送');
       return Promise.resolve(false);
@@ -1126,17 +1122,19 @@ function dateOfDay(iso, week, day){
       note('先点「开启上课提醒」，允许通知');
       return Promise.resolve(false);
     }
+    var got = null;
     return swReady()
       .then(function(reg){
         return reg.pushManager.getSubscription().then(function(old){
-          if (old) return old;
+          if (old){ got = old; return old; }
           return reg.pushManager.subscribe({
             userVisibleOnly: true,
             applicationServerKey: urlB64ToU8(PUSH.key)
-          });
+          }).then(function(s){ got = s; return s; });
         });
       })
       .then(function(sub){
+        if (!pushReady()) return { ok: false, offline: true };
         return fetchTimeout(PUSH.api + '/api/sub', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1149,12 +1147,20 @@ function dateOfDay(iso, week, day){
           note('推送已开启，锁屏、App 划掉都能收到');
           return true;
         }
-        note('订阅没成功，服务器返回异常');
-        return false;
+        throw new Error('offline');
       })
       .catch(function(e){
-        var m = e && e.name === 'AbortError' || (e && e.message === 'timeout');
-        note(m ? '连不上推送服务器（网络不通），这一项暂时用不了'
+        renderNotify();
+        if (got){
+          var code = JSON.stringify(got.toJSON());
+          copyText(code, '推送服务器连不上，订阅码已复制 —— 发给 dsh 就行');
+          setTimeout(function(){
+            note('订阅码已复制。这台服务器当前网络打不开，改用订阅码方式（发给我即可）');
+          }, 400);
+          return false;
+        }
+        var m = (e && e.name === 'AbortError') || (e && e.message === 'timeout');
+        note(m ? '连不上推送服务器，订阅码也没生成出来'
                : '订阅失败：' + (e && e.message ? e.message : '未知错误'));
         return false;
       });

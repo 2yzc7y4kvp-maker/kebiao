@@ -1,0 +1,42 @@
+name: class-push
+
+# 每 5 分钟检查一次：有没有 10~25 分钟后要上的课
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: class-push
+  cancel-in-progress: false
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 检查并推送
+        env:
+          VAPID_PRIVATE_JWK: ${{ secrets.VAPID_PRIVATE_JWK }}
+        run: node scripts/tick.mjs
+
+      - name: 记录已推送
+        run: |
+          git config user.name "class-push-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add scripts/sent.json
+          if git diff --staged --quiet; then
+            echo "没有新推送，不提交"
+          else
+            git commit -m "chore: 记录已推送的课 [skip ci]"
+            git push
+          fi
