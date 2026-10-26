@@ -98,8 +98,9 @@ async function encryptPayload(plaintext, uaRaw, authSecret) {
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const info1 = concat(enc.encode('WebPush: info'), new Uint8Array([0]), uaRaw, asRaw);
   const ikm = await hkdf(authSecret, ecdh, info1, 32);
-  const cek = await hkdf(salt, ikm, enc.encode('Content-Encoding: aes128gcm'), 16);
-  const nonce = await hkdf(salt, ikm, enc.encode('Content-Encoding: nonce'), 12);
+  // RFC 8188：key_info / nonce_info 末尾各有一个 0x00，少了这个 iOS 会静默丢弃
+  const cek = await hkdf(salt, ikm, concat(enc.encode('Content-Encoding: aes128gcm'), new Uint8Array([0])), 16);
+  const nonce = await hkdf(salt, ikm, concat(enc.encode('Content-Encoding: nonce'), new Uint8Array([0])), 12);
 
   const body = concat(enc.encode(plaintext), new Uint8Array([2]));
   const k = await crypto.subtle.importKey('raw', cek, 'AES-GCM', false, ['encrypt']);
