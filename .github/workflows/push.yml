@@ -1,14 +1,17 @@
 name: class-push
 
-# 每 5 分钟检查一次：有没有 10~25 分钟后要上的课
+# GitHub 的 cron 实际几小时才触发一次，抓不住 10~25 分钟这种窗口。
+# 所以这里不指望它准点：让任务一次跑 5 个多小时，期间自己每分钟看表。
+# 只要 cron 一天能触发几次，就始终有任务活着，窗口就不会漏。
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '0 */2 * * *'
   workflow_dispatch:
 
 permissions:
   contents: write
 
+# 不取消旧的：新旧重叠时宁可多跑一个，也别制造空档。
 concurrency:
   group: class-push
   cancel-in-progress: false
@@ -16,7 +19,7 @@ concurrency:
 jobs:
   push:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 360
     steps:
       - uses: actions/checkout@v4
 
@@ -24,19 +27,23 @@ jobs:
         with:
           node-version: '20'
 
-      - name: 检查并推送
+      - name: 长跑检查
         env:
           VAPID_PRIVATE_JWK: ${{ secrets.VAPID_PRIVATE_JWK }}
+          RUN_MINUTES: '340'
         run: node scripts/tick.mjs
 
       - name: 记录已推送
+        if: always()
         run: |
           git config user.name "class-push-bot"
           git config user.email "actions@users.noreply.github.com"
           git add scripts/sent.json
           if git diff --staged --quiet; then
-            echo "没有新推送，不提交"
-          else
-            git commit -m "chore: 记录已推送的课 [skip ci]"
-            git push
+            echo "没有新推送"
+            exit 0
           fi
+          git commit -m "chore: 记录已推送的课 [skip ci]"
+          for i in 1 2 3; do
+            git pull --rebase origin main && git push && break || sleep 5
+          done

@@ -131,11 +131,10 @@ async function sendPush(sub, payload, vapid) {
 }
 
 /* ---------- 主流程 ---------- */
-const now = Date.now();
-const sh = new Date(now + TZ);
-const dayIdx = (sh.getUTCDay() + 6) % 7;          // 0 = 周一
-const nowMin = sh.getUTCHours() * 60 + sh.getUTCMinutes();
-const today = ymd(sh);
+// GitHub 的 cron 实际几小时才触发一次，抓不住 10~25 分钟这个窗口。
+// 所以让这个任务一次跑 RUN_MINUTES 分钟，期间每分钟自己看表。
+const RUN_MINUTES = parseInt(process.env.RUN_MINUTES || '300', 10);
+const deadline = Date.now() + RUN_MINUTES * 60000;
 
 const plan = readJson('plan.json');
 const vapidPub = readJson('vapid.json');
@@ -159,17 +158,32 @@ if (!vapid.privateJwk || !vapid.privateJwk.d) {
   process.exit(0);
 }
 
-const wk = weekNumber(plan.startDate, sh);
-console.log(`北京 ${today} ${String(sh.getUTCHours()).padStart(2, '0')}:${String(sh.getUTCMinutes()).padStart(2, '0')} 周${'一二三四五六日'[dayIdx]} 第${wk}周`);
+function saveSent() {
+  try {
+    fs.writeFileSync(path.join(HERE, 'sent.json'), JSON.stringify(sent, null, 2) + '\n');
+  } catch (e) {}
+}
+process.on('SIGTERM', () => { saveSent(); console.log('收到 SIGTERM，已保存后退出'); process.exit(0); });
+process.on('SIGINT', () => { saveSent(); process.exit(0); });
 
-const fresh = {};
-for (const k of Object.keys(sent)) if (k.startsWith(today)) fresh[k] = sent[k];
-sent = fresh;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-let changed = false;
-const due = [];
+/** 检查一次，返回是否发了推送 */
+async function tickOnce() {
+  const now = Date.now();
+  const sh = new Date(now + TZ);
+  const dayIdx = (sh.getUTCDay() + 6) % 7;
+  const nowMin = sh.getUTCHours() * 60 + sh.getUTCMinutes();
+  const today = ymd(sh);
+  const hm = String(sh.getUTCHours()).padStart(2, '0') + ':' + String(sh.getUTCMinutes()).padStart(2, '0');
 
-if (wk >= 1) {
+  // sent 只留今天的
+  for (const k of Object.keys(sent)) if (!k.startsWith(today)) delete sent[k];
+
+  const wk = weekNumber(plan.startDate, sh);
+  if (wk < 1) return false;
+
+  let fired = false;
   for (const c of plan.courses) {
     if (c.day !== dayIdx) continue;
     if (!parseWeeks(c.weeks).includes(wk)) continue;
@@ -178,28 +192,34 @@ if (wk >= 1) {
     if (diff < LEAD_MIN || diff > LEAD_MAX) continue;
     const key = `${today}|${c.slot}|${c.name}`;
     if (sent[key]) continue;
-    due.push({ c, t, diff, key });
-  }
-}
 
-if (!due.length) {
-  console.log('窗口内没有要上的课');
-} else {
-  for (const d of due) {
-    const label = d.c.short || d.c.name;
+    const label = c.short || c.name;
     const payload = {
       title: `大肥鱼：${label}要上课啦`,
-      body: `${d.t[0]} 在 ${d.c.room || '教室'}` +
-            (d.c.campus ? `（${d.c.campus}）` : '') +
-            `，还有 ${d.diff} 分钟`,
-      tag: `class-${d.c.slot}-${today}`,
+      body: `${t[0]} 在 ${c.room || '教室'}` +
+            (c.campus ? `（${c.campus}）` : '') +
+            `，还有 ${diff} 分钟`,
+      tag: `class-${c.slot}-${today}`,
       url: './#today'
     };
     const r = await sendPush(sub, payload, vapid);
-    console.log(`  ${label} ${d.t[0]} 还有${d.diff}分钟 -> ${r.status} ${r.ok ? 'OK' : 'FAIL ' + r.text}`);
-    if (r.ok || r.gone) { sent[d.key] = Date.now(); changed = true; }
+    console.log(`[${hm}] ${label} ${t[0]} 还有${diff}分钟 -> ${r.status} ${r.ok ? 'OK' : 'FAIL ' + r.text}`);
+    if (r.ok || r.gone) { sent[key] = now; saveSent(); fired = true; }
   }
+  return fired;
 }
 
-fs.writeFileSync(path.join(HERE, 'sent.json'), JSON.stringify(sent, null, 2));
-console.log(changed ? 'sent.json 已更新' : 'sent.json 无变化');
+console.log(`开始长跑：${RUN_MINUTES} 分钟，窗口 ${LEAD_MIN}~${LEAD_MAX} 分钟`);
+
+while (Date.now() < deadline) {
+  try {
+    await tickOnce();
+  } catch (e) {
+    console.log('本轮出错：', e.message);
+  }
+  await sleep(60000);
+}
+
+saveSent();
+console.log('到点了，正常收工');
+
