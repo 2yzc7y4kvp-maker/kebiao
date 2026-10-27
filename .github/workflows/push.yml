@@ -1,11 +1,9 @@
 name: class-push
 
-# GitHub 的 cron 实际几小时才触发一次，抓不住 10~25 分钟这种窗口。
-# 所以这里不指望它准点：让任务一次跑 5 个多小时，期间自己每分钟看表。
-# 只要 cron 一天能触发几次，就始终有任务活着，窗口就不会漏。
+# 已停用：GitHub 的 cron 在这个仓库上几小时才触发一次，抓不住 10~25 分钟的窗口。
+# 现在改用 Cloudflare Worker 的 cron（每分钟，准）。
+# 这里保留成只能手动触发，需要排查时可以点一下跑一次，不会再自动跑、不会重复推送。
 on:
-  schedule:
-    - cron: '0 */2 * * *'
   workflow_dispatch:
 
 permissions:
