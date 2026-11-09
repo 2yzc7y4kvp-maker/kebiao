@@ -92,6 +92,16 @@
   .course.tiny .nm{font-size:14px; -webkit-line-clamp:4; line-height:1.16;}
   .course .nm{max-width:100%;}
   .course .rm{font-size:13px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .course .lab{font-size:10px; line-height:1.15; color:var(--text); opacity:.72; font-weight:600;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; word-break:break-word;}
+  .course.haslab{justify-content:flex-start; gap:2px;}
+  .laball{margin-top:6px;}
+  .laball h3{font-size:14px; color:var(--muted); margin:14px 0 4px; font-weight:600;}
+  .laball .lr{display:flex; gap:10px; padding:7px 0; border-top:1px solid var(--line); font-size:15px;}
+  .laball .lr.now{background:var(--soft); border-radius:8px; padding-left:6px; padding-right:6px;}
+  .laball .lr .w{width:52px; flex:none; color:var(--muted); font-size:13px;}
+  .laball .lr .n{flex:1; line-height:1.4;}
+  .laball .lr .r{flex:none; color:var(--muted); font-size:13px;}
   .hint{text-align:center; font-size:13.5px; color:var(--muted); padding:10px 172px 6px 14px; margin-top:auto; line-height:1.5;}
   .today-head{padding:10px 16px 0;}
   .today-date{font-size:31px; font-weight:700; letter-spacing:.01em;}
@@ -107,6 +117,7 @@
   .badge{display:inline-block; font-size:14.5px; padding:4px 11px; border-radius:999px;
     background:var(--soft); color:var(--accent); margin-top:7px; font-weight:600;}
   .badge.done{background:rgba(122,128,140,.12); color:var(--muted); font-weight:500;}
+  .lesson .m.labnow{color:var(--text); font-weight:600;}
   .empty{text-align:center; padding:46px 24px; color:var(--muted); font-size:15px; line-height:1.8;}
   .empty b{color:var(--text);}
   .card{background:var(--card); border-radius:16px; padding:6px 16px; box-shadow:var(--shadow); margin:0 14px 12px;}
@@ -444,7 +455,7 @@ var COURSES = [
   {name:'大学英语C(1)', short:'大英C',                day:0, slot:0, weeks:'1-16',       room:'C114',        campus:'宝山主区', teachers:['温年芳'], credit:2},
   {name:'高等数学A(1)', short:'高数A',                day:0, slot:1, weeks:'1-16',       room:'BJ207',       campus:'宝山主区', teachers:['孙孟锋'], credit:5},
   {name:'程序设计(C语言)', short:'程设',              day:0, slot:2, weeks:'1-16',       room:'DJ304',       campus:'宝山主区', teachers:['赵俊娟'], credit:3},
-  {name:'大学物理实验A(1)', short:'大物实验',             day:0, slot:3, weeks:'1-16',       room:'F楼实验中心',  campus:'宝山主区', teachers:['张惠芳'], credit:1},
+  {name:'大学物理实验A(1)', short:'大物实验',             day:0, slot:3, weeks:'1-16',       room:'F楼实验中心',  campus:'宝山主区', teachers:['张惠芳'], credit:1, labs:{1:{n:'基础（绪论+数据处理）',r:'指定教室'},2:{n:'基础（数据处理）',r:'指定教室'},3:{n:'基础（不确定度）',r:'指定教室'},4:{n:'预习（下周同老师）',r:'F304B'},5:{n:'薄透镜焦距的测定',r:'F304B'},6:{n:'分光计的调节和使用',r:'F304B'},7:{n:'讲解 J',r:'上周实验室'},8:{n:'预习（下周同老师）',r:'F607B'},9:{n:'重力加速度',r:'F607B'},10:{n:'电桥法测电阻',r:'F607B'},11:{n:'讲解 L',r:'上周实验室'},12:{n:'预习（下周同老师）',r:'F101'},13:{n:'静电场描绘',r:'F101'},14:{n:'霍尔磁场',r:'F101'},15:{n:'补缺',r:'同上实验室'},16:{n:'考核',r:'大屏幕公布'}},},
   {name:'开源技术基础与人工智能应用实践', short:'开源AI', day:0, slot:4, weeks:'9-16',       room:'D415',        campus:'宝山主区', teachers:['许华虎','胡冠男','倪剑樾'], credit:1},
   {name:'军事理论', short:'军理',                    day:0, slot:5, weeks:'1,8,16',     room:'EJ206',       campus:'宝山主区', teachers:['张金翠'], credit:2},
 
@@ -454,7 +465,7 @@ var COURSES = [
 
   {name:'高等数学A(1)', short:'高数A',                day:2, slot:1, weeks:'1-16',       room:'BJ207',       campus:'宝山主区', teachers:['孙孟锋'], credit:5},
   {name:'程序设计(C语言)', short:'程设',              day:2, slot:2, weeks:'1-16',       room:'D413',        campus:'宝山主区', teachers:['赵俊娟'], credit:3},
-  {name:'大学化学实验', short:'大化实验',                day:2, slot:3, weeks:'1-16',       room:'HA四楼',       campus:'宝山主区', teachers:['林锦鸿'], credit:1},
+  {name:'大学化学实验', short:'大化实验',                day:2, slot:3, weeks:'1-16',       room:'HA四楼',       campus:'宝山主区', teachers:['林锦鸿'], credit:1, labs:{1:{n:'绪论与安全教育',r:'410'},2:{n:'基本仪器操作',r:'416'},3:{n:'氧化还原与电化学（一）',r:'408'},4:{n:'氧化还原与电化学（二）',r:'408'},5:{n:'酸碱体积比的测定',r:'316'},6:{n:'苯甲酸的提纯',r:'410'},7:{n:'五水硫酸铜的提纯',r:'416'},8:{n:'电导率法测定（一）',r:'402'},9:{n:'电导率法测 BaSO₄ 溶度积',r:'308'},10:{n:'五水硫酸铜的提纯',r:'416'},11:{n:'氯化铵生成焓的测定',r:'410'},12:{n:'Fe³⁺-NCS⁻ 平衡常数',r:'310'},13:{n:'水的硬度的测定',r:'410'},14:{n:'NaOH 标准溶液标定',r:'316'},15:{n:'化学反应速率常数',r:'402'},16:{n:'（待定）',r:''}},},
 
   {name:'思想道德与法治', short:'思政',              day:3, slot:1, weeks:'1-16',       room:'AJ107',       campus:'宝山主区', teachers:['盛宁'], credit:3},
   {name:'大学化学', short:'大化',                    day:3, slot:2, weeks:'1-16',       room:'EJ204',       campus:'宝山主区', teachers:['吕盈盈'], credit:2},
@@ -561,6 +572,34 @@ function dateOfDay(iso, week, day){
     return PALETTE[(i < 0 ? 0 : i) % PALETTE.length];
   }
   function dayIndexOf(d){ return (d.getDay() + 6) % 7; }
+  function labOf(c, wk){
+    if (!c || !c.labs) return null;
+    return c.labs[wk] || null;
+  }
+  function roomOf(c, wk){
+    var lab = labOf(c, wk);
+    return (lab && lab.r) ? lab.r : (c.room || '');
+  }
+  function labRow(c){
+    var lab = labOf(c, viewWeek);
+    if (!lab) return '';
+    return '<div class="kv"><div class="k">本周</div><div class="v">' +
+      '<b>第 ' + viewWeek + ' 周：' + esc(lab.n) + '</b>' +
+      (lab.r ? '<span class="note">房间 ' + esc(lab.r) + '</span>' : '') + '</div></div>';
+  }
+  function labTable(c){
+    if (!c.labs) return '';
+    var rows = [];
+    for (var w = 1; w <= 16; w++){
+      var l = c.labs[w];
+      if (!l) continue;
+      rows.push('<div class="lr' + (w === viewWeek ? ' now' : '') + '">' +
+        '<span class="w">第' + w + '周</span>' +
+        '<span class="n">' + esc(l.n) + '</span>' +
+        '<span class="r">' + esc(l.r || '') + '</span></div>');
+    }
+    return '<div class="laball"><h3>16 周安排</h3>' + rows.join('') + '</div>';
+  }
   function sameDay(a, b){
     return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
   }
@@ -642,15 +681,18 @@ function dateOfDay(iso, week, day){
     });
     return out;
   }
-  function courseBtn(c, i){
+  function courseBtn(c, i, wk){
     var col = colorOf(c.name);
     var nm = c.short || c.name;
     var cls = nm.length > 9 ? ' tiny' : (nm.length > 5 ? ' small' : '');
     var label = esc(nm).replace(/[（(]/g, '\u200b$&');
     if (/^[\u4e00-\u9fa5]{4,}$/.test(nm)) label = label.slice(0, 2) + '<br>' + label.slice(2);
-    return '<button class="course' + cls + '" data-i="' + i + '" style="--c:' + col + ';--tint:' + tint(col, isDark() ? .22 : .13) + '">' +
-      '<span class="nm">' + label + '</span>' +
-      '<span class="rm">' + esc(c.room) + '</span></button>';
+    var lab = labOf(c, wk);
+    var room = lab && lab.r ? lab.r : c.room;
+    var labline = lab ? '<span class="lab">' + esc(lab.n) + '</span>' : '';
+    return '<button class="course' + cls + (lab ? ' haslab' : '') + '" data-i="' + i + '" style="--c:' + col + ';--tint:' + tint(col, isDark() ? .22 : .13) + '">' +
+      '<span class="nm">' + label + '</span>' + labline +
+      '<span class="rm">' + esc(room) + '</span></button>';
   }
   function renderWeek(){
     var wk = viewWeek;
@@ -672,7 +714,7 @@ function dateOfDay(iso, week, day){
       html += '<div class="tcell"><b>' + SLOTS[s] + '</b>' + esc(t[0]) + '</div>';
       for (var day = 0; day < 5; day++){
         var list = coursesAt(day, s, wk);
-        html += '<div class="cell">' + list.map(function(x){ return courseBtn(x.c, x.i); }).join('') + '</div>';
+        html += '<div class="cell">' + list.map(function(x){ return courseBtn(x.c, x.i, wk); }).join('') + '</div>';
       }
     }
     $('#grid').innerHTML = html;
@@ -744,10 +786,12 @@ function dateOfDay(iso, week, day){
       if (nowMin >= x.en) badge = '<span class="badge done">已结束</span>';
       else if (nowMin >= x.st) badge = '<span class="badge">进行中 · 还剩 ' + fmtDur(x.en - nowMin) + '</span>';
       else badge = '<span class="badge">还有 ' + fmtDur(x.st - nowMin) + '</span>';
+      var lab = labOf(x.c, wk);
       return '<button class="lesson" data-i="' + x.i + '" style="--c:' + col + '">' +
         '<div class="when"><b>第' + SLOTS[x.c.slot] + '节</b>' + esc(x.a) + '<br>' + esc(x.b) + '</div>' +
         '<div class="what"><div class="n">' + esc(x.c.name) + '</div>' +
-        '<div class="m">' + esc(x.c.room) + (x.c.campus ? ' · ' + esc(x.c.campus) : '') + '</div>' +
+        (lab ? '<div class="m labnow">本周实验：' + esc(lab.n) + '</div>' : '') +
+        '<div class="m">' + esc(roomOf(x.c, wk)) + (x.c.campus ? ' · ' + esc(x.c.campus) : '') + '</div>' +
         '<div class="m">' + esc((x.c.teachers || []).join('、')) + '</div>' + badge + '</div></button>';
     }).join('');
   }
@@ -761,13 +805,15 @@ function dateOfDay(iso, week, day){
     $('#sheet-body').innerHTML =
       '<h2>' + esc(c.name) + '</h2>' +
       '<div class="tagline">' + DAYS[c.day] + ' 第' + SLOTS[c.slot] + '节 · ' + esc(t[0]) + '–' + esc(t[1]) + '</div>' +
-      '<div class="kv"><div class="k">地点</div><div class="v">' + esc(c.room) +
+      labRow(c) +
+      '<div class="kv"><div class="k">地点</div><div class="v">' + esc(roomOf(c, viewWeek)) +
         (c.campus ? ' · ' + esc(c.campus) : '') +
         (c.note ? '<span class="note">' + esc(c.note) + '</span>' : '') + '</div></div>' +
       '<div class="kv"><div class="k">老师</div><div class="v">' + esc((c.teachers || []).join('、')) + '</div></div>' +
       '<div class="kv"><div class="k">周次</div><div class="v">' + fmtWeeks(c.weeks) + '</div></div>' +
       '<div class="kv"><div class="k">学分</div><div class="v">' + c.credit + ' 学分' +
-        (c.weeks && !has ? '<span class="note">第 ' + viewWeek + ' 周没课</span>' : '') + '</div></div>';
+        (c.weeks && !has ? '<span class="note">第 ' + viewWeek + ' 周没课</span>' : '') + '</div></div>' +
+      labTable(c);
     $('#sheet').classList.add('open');
   }
   function closeSheet(){ $('#sheet').classList.remove('open'); }
