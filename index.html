@@ -218,6 +218,29 @@
   .remind .r-main{font-size:23px; font-weight:700; margin:9px 0 6px; line-height:1.32;}
   .remind .r-sub{font-size:15px; color:var(--muted); line-height:1.65;}
   .remind .r-btn{margin-top:18px; width:100%; font-size:16px; padding:12px;}
+  /* ---- 每日单词 ---- */
+  .quiz{position:fixed; inset:0; z-index:66; display:none; align-items:center; justify-content:center; padding:20px;}
+  .quiz.open{display:flex;}
+  .quiz .mask{position:absolute; inset:0; background:rgba(8,10,18,.55);}
+  .quiz .box{position:relative; width:100%; max-width:430px; background:var(--card); border-radius:24px;
+    padding:22px 20px 18px; box-shadow:0 20px 64px rgba(10,14,30,.42); animation:pop .26s cubic-bezier(.2,.9,.3,1);}
+  .quiz .q-kicker{font-size:13px; color:var(--accent); font-weight:700; letter-spacing:.08em;}
+  .quiz .q-word{font-size:38px; font-weight:800; letter-spacing:.01em; margin:8px 0 2px;
+    word-break:break-word; line-height:1.15;}
+  .quiz .q-hint{font-size:14px; color:var(--muted); margin-bottom:14px;}
+  .quiz .q-opts{display:flex; flex-direction:column; gap:9px;}
+  .quiz .q-opt{width:100%; text-align:left; font-size:17px; line-height:1.35; padding:13px 15px;
+    border-radius:13px; border:1.5px solid var(--line); background:var(--bg); color:var(--text);
+    font-family:inherit; transition:background .12s, border-color .12s, transform .12s;}
+  .quiz .q-opt:active{transform:scale(.985);}
+  .quiz .q-opt.right{border-color:#22a06b; background:rgba(34,160,107,.14); color:#1a8a5b; font-weight:700;}
+  .quiz .q-opt.wrong{border-color:#e2504f; background:rgba(226,80,79,.12); color:#c8413f;
+    animation:shake .32s; opacity:.55;}
+  .quiz .q-opt:disabled{cursor:default;}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .quiz .q-tip{min-height:22px; font-size:14px; margin-top:12px; line-height:1.5; color:var(--muted);}
+  .quiz .q-tip.ok{color:#22a06b; font-weight:600;}
+  .quiz .q-tip.no{color:#e2504f; font-weight:600;}
   /* ---- 订阅码 ---- */
   .subcode{position:fixed; inset:0; z-index:68; display:none; align-items:center; justify-content:center; padding:18px;}
   .subcode.open{display:flex;}
@@ -434,6 +457,17 @@
   </div>
 </div>
 
+<div class="quiz" id="quiz">
+  <div class="mask"></div>
+  <div class="box">
+    <div class="q-kicker">每日一词 · 雅思</div>
+    <div class="q-word" id="quiz-word"></div>
+    <div class="q-hint">选出正确的中文意思（答错要重选）</div>
+    <div class="q-opts" id="quiz-opts"></div>
+    <div class="q-tip" id="quiz-tip"></div>
+  </div>
+</div>
+
 <div class="subcode" id="subcode">
   <div class="mask" id="subcode-mask"></div>
   <div class="box">
@@ -527,6 +561,166 @@ function weekNumber(iso, date){
   var b = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
   return Math.floor((b - a) / 86400000 / 7) + 1;
 }
+var WORDS = [
+  ['abandon','v. 放弃；抛弃'],
+  ['abolish','v. 废除；取消'],
+  ['abstract','adj. 抽象的'],
+  ['absurd','adj. 荒谬的'],
+  ['abundant','adj. 丰富的；大量的'],
+  ['accelerate','v. 加速'],
+  ['accessible','adj. 可接近的；易理解的'],
+  ['accommodate','v. 容纳；提供住宿'],
+  ['accumulate','v. 积累'],
+  ['accurate','adj. 准确的'],
+  ['acknowledge','v. 承认；致谢'],
+  ['acquire','v. 获得；习得'],
+  ['adapt','v. 适应；改编'],
+  ['adequate','adj. 足够的'],
+  ['adjacent','adj. 邻近的'],
+  ['adjust','v. 调整'],
+  ['admire','v. 钦佩'],
+  ['adopt','v. 采用；收养'],
+  ['advocate','v. 提倡；主张'],
+  ['aesthetic','adj. 美学的'],
+  ['affluent','adj. 富裕的'],
+  ['aggressive','adj. 好斗的；激进的'],
+  ['alleviate','v. 减轻；缓解'],
+  ['allocate','v. 分配'],
+  ['alter','v. 改变'],
+  ['ambiguous','adj. 模棱两可的'],
+  ['ample','adj. 充足的'],
+  ['analyse','v. 分析'],
+  ['anticipate','v. 预料；期望'],
+  ['apparent','adj. 明显的'],
+  ['appeal','v. 呼吁；吸引'],
+  ['applicable','adj. 适用的'],
+  ['appreciate','v. 欣赏；感激'],
+  ['approach','n. 方法；v. 接近'],
+  ['appropriate','adj. 恰当的'],
+  ['approximate','adj. 大约的'],
+  ['arbitrary','adj. 任意的；武断的'],
+  ['arise','v. 出现；产生'],
+  ['articulate','v. 清晰表达'],
+  ['assemble','v. 集合；组装'],
+  ['assess','v. 评估'],
+  ['assign','v. 分配；指派'],
+  ['assume','v. 假定'],
+  ['assure','v. 保证'],
+  ['attain','v. 达到'],
+  ['attribute','v. 归因于'],
+  ['authentic','adj. 真实的；正宗的'],
+  ['autonomous','adj. 自治的'],
+  ['available','adj. 可获得的'],
+  ['aware','adj. 意识到的'],
+  ['beneficial','adj. 有益的'],
+  ['bias','n. 偏见'],
+  ['boost','v. 促进；提升'],
+  ['boundary','n. 边界'],
+  ['breed','v. 繁殖；培养'],
+  ['budget','n. 预算'],
+  ['candidate','n. 候选人'],
+  ['capable','adj. 有能力的'],
+  ['capacity','n. 容量；能力'],
+  ['cease','v. 停止'],
+  ['challenge','n. 挑战'],
+  ['cite','v. 引用'],
+  ['clarify','v. 澄清'],
+  ['coherent','adj. 连贯的'],
+  ['coincide','v. 同时发生；一致'],
+  ['collapse','v. 倒塌'],
+  ['commence','v. 开始'],
+  ['commit','v. 承诺；犯（错）'],
+  ['commodity','n. 商品'],
+  ['compensate','v. 补偿'],
+  ['competent','adj. 有能力的；称职的'],
+  ['compile','v. 汇编'],
+  ['complement','v. 补充'],
+  ['comply','v. 遵守'],
+  ['component','n. 组成部分'],
+  ['comprehensive','adj. 全面的'],
+  ['comprise','v. 包含；由…组成'],
+  ['conceal','v. 隐藏'],
+  ['conceive','v. 构想'],
+  ['concentrate','v. 集中'],
+  ['conclude','v. 得出结论'],
+  ['condense','v. 压缩；浓缩'],
+  ['confine','v. 限制'],
+  ['conform','v. 遵守；符合'],
+  ['consequence','n. 结果；后果'],
+  ['considerable','adj. 相当大的'],
+  ['consist','v. 由…组成'],
+  ['constitute','v. 构成'],
+  ['constrain','v. 限制；约束'],
+  ['consult','v. 咨询'],
+  ['consume','v. 消耗'],
+  ['contemporary','adj. 当代的'],
+  ['contradict','v. 反驳；与…矛盾'],
+  ['contribute','v. 贡献'],
+  ['controversial','adj. 有争议的'],
+  ['convene','v. 召集'],
+  ['convert','v. 转换'],
+  ['convey','v. 传达'],
+  ['convince','v. 说服'],
+  ['cooperate','v. 合作'],
+  ['crucial','adj. 关键的'],
+  ['cultivate','v. 培养；耕作'],
+  ['cumulative','adj. 累积的'],
+  ['currency','n. 货币'],
+  ['decline','v. 下降；婉拒'],
+  ['dedicate','v. 致力于'],
+  ['deficit','n. 赤字；不足'],
+  ['definite','adj. 明确的'],
+  ['deliberate','adj. 故意的'],
+  ['demonstrate','v. 证明；示范'],
+  ['denote','v. 表示'],
+  ['depict','v. 描绘'],
+  ['derive','v. 源自；获得'],
+  ['descend','v. 下降'],
+  ['designate','v. 指定'],
+  ['detect','v. 察觉；检测'],
+  ['deteriorate','v. 恶化'],
+  ['deviate','v. 偏离'],
+  ['diminish','v. 减少'],
+  ['discard','v. 丢弃'],
+  ['discern','v. 辨别'],
+  ['discrete','adj. 离散的；分开的'],
+  ['displace','v. 取代；使离开'],
+  ['dispose','v. 处理；处置'],
+  ['dispute','n. 争论'],
+  ['distinct','adj. 明显的；不同的'],
+  ['distort','v. 扭曲'],
+  ['diverse','adj. 多样的'],
+  ['domestic','adj. 国内的；家庭的'],
+  ['dominate','v. 支配'],
+  ['drastic','adj. 激烈的；极端的'],
+  ['durable','adj. 耐用的'],
+  ['dynamic','adj. 动态的'],
+  ['elaborate','adj. 精细的；v. 详述'],
+  ['eliminate','v. 消除'],
+  ['embrace','v. 拥抱；接受'],
+  ['emerge','v. 出现'],
+  ['emphasise','v. 强调'],
+  ['empirical','adj. 经验主义的'],
+  ['enable','v. 使能够'],
+  ['endeavour','n. 努力'],
+  ['enhance','v. 增强'],
+  ['enormous','adj. 巨大的'],
+  ['ensure','v. 确保'],
+  ['entail','v. 需要；涉及'],
+  ['equivalent','adj. 等价的'],
+  ['essential','adj. 必要的；本质的'],
+  ['establish','v. 建立'],
+  ['estimate','v. 估计'],
+  ['evident','adj. 明显的'],
+  ['evoke','v. 唤起'],
+  ['exceed','v. 超过'],
+  ['exclude','v. 排除'],
+  ['explicit','adj. 明确的'],
+  ['exploit','v. 利用；剥削'],
+  ['expose','v. 暴露'],
+  ['external','adj. 外部的']
+];
+
 function dateOfDay(iso, week, day){
   var base = startMs(iso) + ((week - 1) * 7 + day) * 86400000;
   var d = new Date(base);
@@ -1132,6 +1326,102 @@ function dateOfDay(iso, week, day){
     checkRemind();
   }
 
+  /* ---------- 每日单词 ---------- */
+  var QUIZ = { idx: -1, opts: [], done: false };
+
+  function wordOfDay(){
+    var d = new Date();
+    var days = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
+    return ((days % WORDS.length) + WORDS.length) % WORDS.length;
+  }
+  function todayKey(){
+    var d = new Date();
+    return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+  }
+  function posOf(cn){
+    var m = String(cn).match(/^([a-z]+\.)/);
+    return m ? m[1] : '';
+  }
+  function buildOptions(idx){
+    var correct = WORDS[idx][1];
+    var pos = posOf(correct);
+    // 先挑同词性的（否则一眼靠 v./adj. 就能排除），不够再用别的补
+    var same = [], other = [];
+    for (var i = 0; i < WORDS.length; i++){
+      if (i === idx) continue;
+      var cn = WORDS[i][1];
+      if (cn === correct) continue;
+      (posOf(cn) === pos ? same : other).push(cn);
+    }
+    var pool = [];
+    function take(arr){
+      while (arr.length && pool.length < 3){
+        var k = Math.floor(Math.random() * arr.length);
+        var v = arr.splice(k, 1)[0];
+        if (pool.indexOf(v) < 0) pool.push(v);
+      }
+    }
+    take(same);
+    take(other);
+    var opts = pool.concat([correct]);
+    for (var i = opts.length - 1; i > 0; i--){
+      var k = Math.floor(Math.random() * (i + 1));
+      var t = opts[i]; opts[i] = opts[k]; opts[k] = t;
+    }
+    return opts;
+  }
+  function renderQuiz(){
+    $('#quiz-word').textContent = WORDS[QUIZ.idx][0];
+    var box = $('#quiz-opts');
+    box.innerHTML = '';
+    QUIZ.opts.forEach(function(text){
+      var b = document.createElement('button');
+      b.className = 'q-opt';
+      b.type = 'button';
+      b.textContent = text;
+      b.addEventListener('click', function(){ answerQuiz(b, text); });
+      box.appendChild(b);
+    });
+    $('#quiz-tip').textContent = '';
+    $('#quiz-tip').className = 'q-tip';
+    QUIZ.done = false;
+  }
+  function answerQuiz(btn, text){
+    if (QUIZ.done) return;
+    var correct = WORDS[QUIZ.idx][1];
+    if (text === correct){
+      QUIZ.done = true;
+      btn.classList.add('right');
+      Array.prototype.forEach.call($('#quiz-opts').children, function(b){ b.disabled = true; });
+      var tip = $('#quiz-tip');
+      tip.textContent = '答对了 · 今天打卡完成';
+      tip.className = 'q-tip ok';
+      state.settings.wordDone = todayKey();
+      saveState();
+      setTimeout(closeQuiz, 1200);
+    } else {
+      btn.classList.add('wrong');
+      btn.disabled = true;
+      var t2 = $('#quiz-tip');
+      t2.textContent = '不对，再想想';
+      t2.className = 'q-tip no';
+      setTimeout(function(){ t2.textContent = '不对，再想想'; }, 1200);
+    }
+  }
+  function openQuiz(){
+    var today = todayKey();
+    if (state.settings.wordDone === today) return false;
+    if ($('#lock').classList.contains('open')) return false;
+    QUIZ.idx = wordOfDay();
+    QUIZ.opts = buildOptions(QUIZ.idx);
+    renderQuiz();
+    $('#quiz').classList.add('open');
+    return true;
+  }
+  function closeQuiz(){
+    $('#quiz').classList.remove('open');
+  }
+
   /* ---------- Web Push ---------- */
   // api 部署后填；key 是 VAPID 公钥（和后端 VAPID_PUBLIC_KEY 一致）
   var PUSH = {
@@ -1621,7 +1911,7 @@ function dateOfDay(iso, week, day){
   state = loadState();
   applyTheme();
   document.addEventListener('visibilitychange', function(){
-    if (!document.hidden) { checkRemind(); renderNotify(); }
+    if (!document.hidden){ checkRemind(); renderNotify(); openQuiz(); }
   });
   if ('serviceWorker' in navigator){
     navigator.serviceWorker.addEventListener('message', function(e){
@@ -1637,6 +1927,7 @@ function dateOfDay(iso, week, day){
   initPet();
   render();
   if (state.settings.pin) lockOpen();
+  setTimeout(function(){ openQuiz(); }, 900);
   var h = (location.hash || '').replace('#', '');
   if (h === 'today' || h === 'settings') switchView(h);
 })();
