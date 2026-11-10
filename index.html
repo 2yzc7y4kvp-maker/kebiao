@@ -147,15 +147,19 @@
   summary{font-size:15px; cursor:pointer; color:var(--text);}
   /* ---- dsh-pet ---- */
   .petwrap{position:fixed; right:8px; bottom:calc(var(--tabh) + 38px + env(safe-area-inset-bottom)); z-index:25;
-           width:176px; height:176px; touch-action:none; -webkit-user-select:none; user-select:none;}
+           width:220px; height:220px; touch-action:none; -webkit-user-select:none; user-select:none;
+           transition:right 1.5s ease-in-out, bottom 1.5s ease-in-out;}
   .petwrap.off{display:none;}
-  .petwrap img{width:176px; height:176px; display:block; pointer-events:none;
+  .petwrap img{width:220px; height:220px; display:block; pointer-events:none;
                filter:drop-shadow(0 8px 10px rgba(20,30,60,.22));
                animation:petFloat 3.8s ease-in-out infinite;}
   @keyframes petFloat{0%,100%{transform:translateY(0) rotate(-2deg);}50%{transform:translateY(-7px) rotate(2deg);}}
   .petwrap.pop img{animation:petPop .5s cubic-bezier(.2,.9,.3,1);}
+  .petwrap.dragging{transition:none;}
+  .petwrap.roaming img{animation:petSwim 1s ease-in-out infinite;}
+  @keyframes petSwim{0%,100%{transform:rotate(-4deg) translateY(0);}50%{transform:rotate(4deg) translateY(-4px);}}
   @keyframes petPop{0%{transform:scale(1) rotate(0);}40%{transform:scale(1.16) rotate(5deg);}70%{transform:scale(.97) rotate(-2deg);}100%{transform:scale(1) rotate(0);}}
-  .pet-bubble{position:absolute; right:2px; bottom:182px; width:max-content; max-width:268px;
+  .pet-bubble{position:absolute; right:2px; bottom:226px; width:max-content; max-width:268px;
               background:var(--card); color:var(--text); border:1px solid var(--line); border-radius:16px;
               padding:12px 15px; font-size:16px; line-height:1.45; box-shadow:var(--shadow);
               opacity:0; transform:translateY(6px) scale(.96); transform-origin:right bottom;
@@ -276,8 +280,8 @@
     :root{--tabh:86px;}
     .tab{font-size:17px; gap:3px;}
     .tab svg{width:34px; height:34px;}
-    .petwrap{width:128px; height:128px; bottom:calc(var(--tabh) + 10px + env(safe-area-inset-bottom));}
-    .petwrap img{width:128px; height:128px;}
+    .petwrap{width:158px; height:158px; bottom:calc(var(--tabh) + 10px + env(safe-area-inset-bottom));}
+    .petwrap img{width:158px; height:158px;}
     .pet-bubble{bottom:calc(var(--tabh) + 32px); max-width:200px; padding:10px 13px; font-size:14px;}
     .toast{bottom:calc(126px + env(safe-area-inset-bottom));}
     .hint{padding-right:132px; font-size:11.5px;}
@@ -488,7 +492,7 @@
 var COURSES = [
   {name:'大学英语C(1)', short:'大英C',                day:0, slot:0, weeks:'1-16',       room:'C114',        campus:'宝山主区', teachers:['温年芳'], credit:2},
   {name:'高等数学A(1)', short:'高数A',                day:0, slot:1, weeks:'1-16',       room:'BJ207',       campus:'宝山主区', teachers:['孙孟锋'], credit:5},
-  {name:'程序设计(C语言)', short:'程设',              day:0, slot:2, weeks:'1-16',       room:'DJ304',       campus:'宝山主区', teachers:['赵俊娟'], credit:3},
+  {name:'程序设计(C语言)', short:'C语言',             day:0, slot:2, weeks:'1-16',       room:'DJ304',       campus:'宝山主区', teachers:['赵俊娟'], credit:3},
   {name:'大学物理实验A(1)', short:'大物实验',             day:0, slot:3, weeks:'1-16',       room:'F楼实验中心',  campus:'宝山主区', teachers:['张惠芳'], credit:1, labs:{1:{n:'基础',r:'指定教室'},2:{n:'基础',r:'指定教室'},3:{n:'基础',r:'指定教室'},4:{n:'预习（下周同老师）',r:'F304B'},5:{n:'薄透镜焦距的测定',r:'F304B'},6:{n:'分光计的调节和使用',r:'F304B'},7:{n:'讲解 J',r:'上周实验室'},8:{n:'预习（下周同老师）',r:'F607B'},9:{n:'重力加速度',r:'F607B'},10:{n:'电桥法测电阻',r:'F607B'},11:{n:'讲解 L',r:'上周实验室'},12:{n:'预习（下周同老师）',r:'F101'},13:{n:'静电场描绘',r:'F101'},14:{n:'霍尔磁场',r:'F101'},15:{n:'补缺',r:'同上周'},16:{n:'考核',r:'大屏幕公布'}},},
   {name:'开源技术基础与人工智能应用实践', short:'开源AI', day:0, slot:4, weeks:'9-16',       room:'D415',        campus:'宝山主区', teachers:['许华虎','胡冠男','倪剑樾'], credit:1},
   {name:'军事理论', short:'军理',                    day:0, slot:5, weeks:'1,8,16',     room:'EJ206',       campus:'宝山主区', teachers:['张金翠'], credit:2},
@@ -498,7 +502,7 @@ var COURSES = [
   {name:'大学物理A(1)', short:'大物',                day:1, slot:3, weeks:'1-16',       room:'DJ204',       campus:'宝山主区', teachers:['戴晔'], credit:4},
 
   {name:'高等数学A(1)', short:'高数A',                day:2, slot:1, weeks:'1-16',       room:'BJ207',       campus:'宝山主区', teachers:['孙孟锋'], credit:5},
-  {name:'程序设计(C语言)', short:'程设',              day:2, slot:2, weeks:'1-16',       room:'D413',        campus:'宝山主区', teachers:['赵俊娟'], credit:3},
+  {name:'程序设计(C语言)', short:'C语言',             day:2, slot:2, weeks:'1-16',       room:'D413',        campus:'宝山主区', teachers:['赵俊娟'], credit:3},
   {name:'大学化学实验', short:'大化实验',                day:2, slot:3, weeks:'1-16',       room:'HA四楼',       campus:'宝山主区', teachers:['林锦鸿'], credit:1, labs:{1:{n:'绪论与安全教育',r:'416'},2:{n:'基本仪器操作',r:'416'},3:{n:'氧化还原与电化学（一）',r:'408'},4:{n:'氧化还原与电化学（二）',r:'408'},5:{n:'酸碱体积比的测定',r:'316'},6:{n:'苯甲酸的提纯',r:'410'},7:{n:'乙酸电离常数的测定',r:'402'},8:{n:'缓冲溶液的配制及性质测定',r:'402'},9:{n:'电导率法测 BaSO₄ 溶度积',r:'308'},10:{n:'五水硫酸铜的制备',r:'416'},11:{n:'五水硫酸铜的提纯',r:'416'},12:{n:'氯化铵生成焓的测定',r:'410'},13:{n:'Fe³⁺-NCS⁻ 平衡常数的测定',r:'310'},14:{n:'水的硬度的测定',r:'410'},15:{n:'NaOH 标准溶液的浓度标定',r:'316'},16:{n:'化学反应速率常数及反应级数',r:'402'}},},
 
   {name:'思想道德与法治', short:'思政',              day:3, slot:1, weeks:'1-16',       room:'AJ107',       campus:'宝山主区', teachers:['盛宁'], credit:3},
@@ -1220,6 +1224,42 @@ function dateOfDay(iso, week, day){
     }
     petSay('今天的课上完啦，去吃饭吧～', 'happy');
   }
+  var ROAM = { timer: null, pausedUntil: 0 };
+  function petRoamStop(){
+    if (ROAM.timer){ clearInterval(ROAM.timer); ROAM.timer = null; }
+  }
+  function petRoamStep(){
+    if (!petOn() || !PET.el || document.hidden || PET.drag) return;
+    if (Date.now() < ROAM.pausedUntil) return;
+    if (Date.now() < (PET.nextMoveAt || 0)) return;
+    petRoamMove();
+  }
+  function petRoamMove(){
+    var sz = petSize();
+    var maxR = Math.max(6, window.innerWidth - sz.w - 8);
+    var maxB = Math.max(80, window.innerHeight - sz.h - 90);
+    // 别每次都挪太远，看着像在游，不像在瞬移
+    var curR = parseFloat(PET.el.style.right) || 8;
+    var curB = parseFloat(PET.el.style.bottom) || 60;
+    var jump = 90 + Math.random() * 160;
+    var dirR = Math.random() < 0.5 ? -1 : 1;
+    var dirB = Math.random() < 0.5 ? -1 : 1;
+    var r = clampNum(curR + dirR * jump, 6, maxR);
+    var b = clampNum(curB + dirB * jump * 0.6, 80, maxB);
+    // 撞到边就掉头
+    if (r <= 6 || r >= maxR) r = clampNum(curR - dirR * jump, 6, maxR);
+    if (b <= 80 || b >= maxB) b = clampNum(curB - dirB * jump * 0.6, 80, maxB);
+    PET.el.classList.add('roaming');
+    PET.el.style.right = Math.round(r) + 'px';
+    PET.el.style.bottom = Math.round(b) + 'px';
+    PET.nextMoveAt = Date.now() + 2600 + Math.random() * 4200;
+    setTimeout(function(){ if (PET.el) PET.el.classList.remove('roaming'); }, 1600);
+  }
+  function petRoamStart(){
+    petRoamStop();
+    ROAM.timer = setInterval(petRoamStep, 800);
+  }
+
   function petTap(){
     var now = new Date(), nowMin = now.getHours() * 60 + now.getMinutes();
     var r = petReminder(now);
@@ -1302,6 +1342,7 @@ function dateOfDay(iso, week, day){
           bottom: parseFloat(PET.el.style.bottom) || 90
         };
         saveState();
+        ROAM.pausedUntil = Date.now() + 25000;   // 你放哪就先待一会儿
       } else {
         petTap();
       }
@@ -1316,7 +1357,8 @@ function dateOfDay(iso, week, day){
       state.settings.pet = !petOn();
       saveState();
       petShow();
-      if (petOn()) petSay('我回来啦～', 'happy');
+      if (petOn()){ petSay('我回来啦～', 'happy'); petRoamStart(); }
+      else { petRoamStop(); }
     });
 
     window.addEventListener('resize', applyPetPos);
@@ -1324,6 +1366,7 @@ function dateOfDay(iso, week, day){
     setInterval(petTick, 30000);
     setInterval(checkRemind, 15000);
     checkRemind();
+    petRoamStart();
   }
 
   /* ---------- 每日单词 ---------- */
@@ -1397,6 +1440,7 @@ function dateOfDay(iso, week, day){
       tip.textContent = '答对了 · 今天打卡完成';
       tip.className = 'q-tip ok';
       state.settings.wordDone = todayKey();
+      state.settings.wordCount = (state.settings.wordCount || 0) + 1;
       saveState();
       setTimeout(closeQuiz, 1200);
     } else {
@@ -1409,10 +1453,11 @@ function dateOfDay(iso, week, day){
     }
   }
   function openQuiz(){
-    var today = todayKey();
-    if (state.settings.wordDone === today) return false;
     if ($('#lock').classList.contains('open')) return false;
-    QUIZ.idx = wordOfDay();
+    // 每次打开都出题，但别连着出同一个词
+    var idx = Math.floor(Math.random() * WORDS.length);
+    if (WORDS.length > 1 && idx === QUIZ.idx) idx = (idx + 1) % WORDS.length;
+    QUIZ.idx = idx;
     QUIZ.opts = buildOptions(QUIZ.idx);
     renderQuiz();
     $('#quiz').classList.add('open');
@@ -1911,7 +1956,7 @@ function dateOfDay(iso, week, day){
   state = loadState();
   applyTheme();
   document.addEventListener('visibilitychange', function(){
-    if (!document.hidden){ checkRemind(); renderNotify(); openQuiz(); }
+    if (!document.hidden){ checkRemind(); renderNotify(); }
   });
   if ('serviceWorker' in navigator){
     navigator.serviceWorker.addEventListener('message', function(e){
