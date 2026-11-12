@@ -245,6 +245,24 @@
   .quiz .q-tip{min-height:22px; font-size:14px; margin-top:12px; line-height:1.5; color:var(--muted);}
   .quiz .q-tip.ok{color:#22a06b; font-weight:600;}
   .quiz .q-tip.no{color:#e2504f; font-weight:600;}
+  /* ---- 错题本 ---- */
+  .wrongbook{position:fixed; inset:0; z-index:67; display:none; align-items:center; justify-content:center; padding:20px;}
+  .wrongbook.open{display:flex;}
+  .wrongbook .mask{position:absolute; inset:0; background:rgba(8,10,18,.55);}
+  .wrongbook .box{position:relative; width:100%; max-width:440px; max-height:82vh; display:flex;
+    flex-direction:column; background:var(--card); border-radius:22px; padding:20px 18px 16px;
+    box-shadow:0 20px 64px rgba(10,14,30,.42); animation:pop .26s cubic-bezier(.2,.9,.3,1);}
+  .wrongbook h3{margin:0 0 4px; font-size:20px;}
+  .wrongbook h3 span{font-size:14px; color:var(--muted); font-weight:500; margin-left:6px;}
+  .wrongbook .wlist{flex:1 1 auto; overflow:auto; margin:8px 0 0; min-height:80px;}
+  .wrongbook .item{display:flex; align-items:baseline; gap:10px; padding:11px 0; border-top:1px solid var(--line);}
+  .wrongbook .item:first-child{border-top:0;}
+  .wrongbook .item .w{font-size:18px; font-weight:700; flex:none;}
+  .wrongbook .item .c{flex:1; font-size:15px; color:var(--muted); line-height:1.4;}
+  .wrongbook .item .n{flex:none; font-size:12px; color:#e2504f; font-weight:600;}
+  .wrongbook .empty2{text-align:center; padding:28px 10px; color:var(--muted); font-size:14px; line-height:1.7;}
+  .wrongbook .btns{padding:12px 0 0;}
+  .wrongbook .btns .btn{flex:1;}
   /* ---- 订阅码 ---- */
   .subcode{position:fixed; inset:0; z-index:68; display:none; align-items:center; justify-content:center; padding:18px;}
   .subcode.open{display:flex;}
@@ -397,6 +415,13 @@
     </div>
 
     <div class="card">
+      <h3>单词</h3>
+      <div class="row"><span class="k">错题本</span><span class="v" id="wrong-count">0 个</span></div>
+      <div class="btns"><button class="btn" id="wrong-open">查看错题</button></div>
+      <div class="note">做单词题选错的词会自动记在这里，方便回头复习。</div>
+    </div>
+
+    <div class="card">
       <h3>dsh-pet</h3>
       <div class="row"><span class="k">大肥鱼</span><span class="v" id="pet-state">显示中</span></div>
       <div class="btns"><button class="btn" id="pet-toggle">隐藏大肥鱼</button></div>
@@ -458,6 +483,18 @@
     <div class="r-main" id="remind-main"></div>
     <div class="r-sub" id="remind-sub"></div>
     <button class="btn primary r-btn" id="remind-ok">知道了</button>
+  </div>
+</div>
+
+<div class="wrongbook" id="wrongbook">
+  <div class="mask" id="wrong-mask"></div>
+  <div class="box">
+    <h3>错题本 <span id="wrong-n"></span></h3>
+    <div class="wlist" id="wrong-list"></div>
+    <div class="btns">
+      <button class="btn danger" id="wrong-clear">清空</button>
+      <button class="btn primary" id="wrong-close">关闭</button>
+    </div>
   </div>
 </div>
 
@@ -1042,6 +1079,7 @@ function dateOfDay(iso, week, day){
     if ($('#info-name')) $('#info-name').textContent = state.settings.name || '—';
     if ($('#info-sid')) $('#info-sid').textContent = state.settings.sid || '—';
     $('#info-count').textContent = uniqueNames().length + ' 门';
+    renderWrongCount();
     $('#info-credits').textContent = totalCredits() + ' 学分';
     petShow();
   }
@@ -1446,12 +1484,61 @@ function dateOfDay(iso, week, day){
     } else {
       btn.classList.add('wrong');
       btn.disabled = true;
+      addWrong(WORDS[QUIZ.idx][0], correct);
       var t2 = $('#quiz-tip');
-      t2.textContent = '不对，再想想';
+      t2.textContent = '不对，再想想（已记进错题本）';
       t2.className = 'q-tip no';
-      setTimeout(function(){ t2.textContent = '不对，再想想'; }, 1200);
     }
   }
+  /* ---- 错题本 ---- */
+  function wrongMap(){
+    if (!state.settings.wrong || typeof state.settings.wrong !== 'object') state.settings.wrong = {};
+    return state.settings.wrong;
+  }
+  function addWrong(word, cn){
+    var m = wrongMap();
+    var cur = m[word] || { cn: cn, n: 0 };
+    cur.cn = cn;
+    cur.n = (cur.n || 0) + 1;
+    cur.t = Date.now();
+    m[word] = cur;
+    saveState();
+    renderWrongCount();
+  }
+  function renderWrongCount(){
+    var el = $('#wrong-count');
+    if (!el) return;
+    var n = Object.keys(wrongMap()).length;
+    el.textContent = n ? n + ' 个' : '还没有';
+    el.className = 'v notify-state ' + (n ? 'no' : '');
+  }
+  function renderWrong(){
+    var box = $('#wrong-list');
+    if (!box) return;
+    var m = wrongMap();
+    var list = Object.keys(m).map(function(w){
+      return { w: w, cn: m[w].cn, n: m[w].n || 1, t: m[w].t || 0 };
+    }).sort(function(a, b){ return (b.t || 0) - (a.t || 0); });
+
+    $('#wrong-n').textContent = list.length ? '共 ' + list.length + ' 个' : '';
+    if (!list.length){
+      box.innerHTML = '<div class="empty2">还没有错题。<br>做单词题时选错的词会自动记到这里。</div>';
+      return;
+    }
+    box.innerHTML = list.map(function(it){
+      return '<div class="item"><span class="w">' + esc(it.w) + '</span>' +
+        '<span class="c">' + esc(it.cn) + '</span>' +
+        '<span class="n">错 ' + it.n + ' 次</span></div>';
+    }).join('');
+  }
+  function openWrong(){
+    renderWrong();
+    $('#wrongbook').classList.add('open');
+  }
+  function closeWrong(){
+    $('#wrongbook').classList.remove('open');
+  }
+
   function openQuiz(){
     if ($('#lock').classList.contains('open')) return false;
     // 每次打开都出题，但别连着出同一个词
@@ -1903,6 +1990,20 @@ function dateOfDay(iso, week, day){
     });
     if (nt) nt.addEventListener('click', sysNotifyTest);
     if (pff) pff.addEventListener('click', pushOff);
+    var wOpen = $('#wrong-open'), wClose = $('#wrong-close'), wMask = $('#wrong-mask'), wClear = $('#wrong-clear');
+    if (wOpen) wOpen.addEventListener('click', openWrong);
+    if (wClose) wClose.addEventListener('click', closeWrong);
+    if (wMask) wMask.addEventListener('click', closeWrong);
+    if (wClear) wClear.addEventListener('click', function(){
+      if (!Object.keys(wrongMap()).length){ toast('错题本是空的'); return; }
+      if (!confirm('清空错题本？')) return;
+      state.settings.wrong = {};
+      saveState();
+      renderWrong();
+      renderWrongCount();
+      toast('已清空');
+    });
+
     var scC = $('#subcode-close'), scP = $('#subcode-copy'), scM = $('#subcode-mask');
     if (scC) scC.addEventListener('click', hideSubCode);
     if (scM) scM.addEventListener('click', hideSubCode);
